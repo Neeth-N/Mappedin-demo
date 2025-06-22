@@ -11,8 +11,15 @@ function MyCustomComponent() {
   const [startSpace, setStartSpace] = useState(null);
   const [path, setPath] = useState(null);
   const [pathfindingEnabled, setPathfindingEnabled] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
 
-  // Add minimal helper function
+  // Add notification helper function
+  const showNotification = (message, type = "info") => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "" });
+    }, 2000);
+  };
   const setSpacesInteractive = (interactive) => {
     if (!mapView || !mapData) return;
     const spaces = mapData.getByType("space");
@@ -71,29 +78,36 @@ function MyCustomComponent() {
         if (!startSpace) {
           if (event.spaces && event.spaces.length > 0) {
             setStartSpace(event.spaces[0]);
+            showNotification(`Start point selected: ${event.spaces[0].name},\n Click Destination Space`, "success");
             console.log("Start point selected: " + event.spaces[0].name);
           }
         } else if (!path && event.spaces && event.spaces[0]) {
           const directions = mapData.getDirections(startSpace, event.spaces[0]);
-          if (!directions) return;
+          if (!directions) {
+            showNotification("No path found between these spaces", "error");
+            return;
+          }
           const newPath = mapView.Paths.add(directions.coordinates, {
             nearRadius: 0.5,
             farRadius: 0.5,
-            color: "orange",
+            color: "#1871fb",
           });
           setPath(newPath);
           setSpacesInteractive(false);
+          showNotification(`Path created to: ${event.spaces[0].name}`, "success");
           console.log("Path created");
         } else if (path) {
           mapView.Paths.removeAll();
           setStartSpace(null);
           setPath(null);
           setSpacesInteractive(true);
+          showNotification("Path cleared. Click a space to start new path", "info");
           console.log("Path removed");
         }
       } else {
         // Original click behavior
         if (event.spaces && event.spaces.length > 0) {
+          showNotification(`Clicked: ${event.spaces[0].name}`, "info");
           console.log("Clicked on Space: " + event.spaces[0].name);
           // You can add more click handling logic here
         }
@@ -161,6 +175,9 @@ function MyCustomComponent() {
               setStartSpace(null);
               setPath(null);
               setSpacesInteractive(true);
+              showNotification("Pathfinding disabled and paths cleared", "info");
+            } else if (!pathfindingEnabled) {
+              showNotification("Pathfinding enabled. Click a space to start", "success");
             }
           }}
           style={{ 
@@ -198,6 +215,39 @@ function MyCustomComponent() {
           </select>
         </div>
       )}
+
+      {/* Notification Popup */}
+      {notification.show && (
+        <div style={{
+          position: "absolute",
+          top: "50%",
+          left: "150%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: notification.type === "error" ? "#ff4444" : 
+                          notification.type === "success" ? "#4488ff" : "#4488ff",
+          color: "white",
+          padding: "15px 20px",
+          borderRadius: "10px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+          zIndex: 2000,
+          fontSize: "16px",
+          fontWeight: "bold",
+          textAlign: "center",
+          minWidth: "200px",
+          animation: "fadeInOut 2s ease-in-out"
+        }}>
+          {notification.message}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+          15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+      `}</style>
     </div>
   );
 }

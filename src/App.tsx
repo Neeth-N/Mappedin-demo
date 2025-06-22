@@ -7,6 +7,27 @@ function MyCustomComponent() {
   const [labels, setLabels] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState("");
 
+  // Add minimal state for pathfinding
+  const [startSpace, setStartSpace] = useState(null);
+  const [path, setPath] = useState(null);
+  const [pathfindingEnabled, setPathfindingEnabled] = useState(false);
+
+  // Add minimal helper function
+  const setSpacesInteractive = (interactive) => {
+    if (!mapView || !mapData) return;
+    const spaces = mapData.getByType("space");
+    spaces.forEach((space) => {
+      try {
+        mapView.updateState(space, {
+          interactive: interactive,
+          hoverColor: interactive ? "rgba(83, 97, 228)" : undefined,
+        });
+      } catch (error) {
+        console.warn("Could not update state for space:", space.name, error);
+      }
+    });
+  };
+
   useEffect(() => {
     if (!mapView || !mapData) return;
 
@@ -41,13 +62,41 @@ function MyCustomComponent() {
       zoomLevel: 20.5,
       pitch: 50,   
     });
-    
 
-    // Add click event listener
-    const handleClick = (e) => {
-      if (e.spaces && e.spaces.length > 0) {
-        console.log("Clicked on Space: " + e.spaces[0].name);
-        // You can add more click handling logic here
+    // Replace the original click handler with your pathfinding logic
+    const handleClick = async (event) => {
+      if (!event) return;
+      
+      if (pathfindingEnabled) {
+        if (!startSpace) {
+          if (event.spaces && event.spaces.length > 0) {
+            setStartSpace(event.spaces[0]);
+            console.log("Start point selected: " + event.spaces[0].name);
+          }
+        } else if (!path && event.spaces && event.spaces[0]) {
+          const directions = mapData.getDirections(startSpace, event.spaces[0]);
+          if (!directions) return;
+          const newPath = mapView.Paths.add(directions.coordinates, {
+            nearRadius: 0.5,
+            farRadius: 0.5,
+            color: "orange",
+          });
+          setPath(newPath);
+          setSpacesInteractive(false);
+          console.log("Path created");
+        } else if (path) {
+          mapView.Paths.removeAll();
+          setStartSpace(null);
+          setPath(null);
+          setSpacesInteractive(true);
+          console.log("Path removed");
+        }
+      } else {
+        // Original click behavior
+        if (event.spaces && event.spaces.length > 0) {
+          console.log("Clicked on Space: " + event.spaces[0].name);
+          // You can add more click handling logic here
+        }
       }
     };
 
@@ -61,7 +110,7 @@ function MyCustomComponent() {
         console.warn("Error removing click listener:", error);
       }
     };
-  }, [mapView, mapData]);
+  }, [mapView, mapData, startSpace, path, pathfindingEnabled]);
 
   const populateFloors = (floorStackId) => {
     if (!mapData) return [];
@@ -97,6 +146,39 @@ function MyCustomComponent() {
 
   return (
     <div style={{ position: "absolute", top: "1vh", left: "10px", zIndex: 1000 }}>
+      {/* Pathfinding Toggle */}
+      <div style={{ 
+        background: "transparent", 
+        padding: "10px", 
+        marginBottom: "5px"
+      }}>
+        <button
+          onClick={() => {
+            setPathfindingEnabled(!pathfindingEnabled);
+            // Reset pathfinding state when disabling
+            if (pathfindingEnabled && path) {
+              mapView.Paths.removeAll();
+              setStartSpace(null);
+              setPath(null);
+              setSpacesInteractive(true);
+            }
+          }}
+          style={{ 
+            width: "200px", 
+            height: '3vh', 
+            padding: "5px", 
+            borderRadius: "10px", 
+            border: "1px solid #ccc", 
+            backgroundColor: pathfindingEnabled ? "#1871fb" : "rgba(255, 255, 255, 0.8)", 
+            color: pathfindingEnabled ? "white" : "#333",
+            cursor: "pointer",
+            fontSize: "14px"
+          }}
+        >
+          {pathfindingEnabled ? "Disable Pathfinding" : "Enable Pathfinding"}
+        </button>
+      </div>
+
       {floorStacks.length > 0 && (
         <div style={{ 
           background: "transparent", 

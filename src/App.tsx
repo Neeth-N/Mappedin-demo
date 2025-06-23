@@ -12,6 +12,10 @@ function MyCustomComponent() {
   const [path, setPath] = useState(null);
   const [pathfindingEnabled, setPathfindingEnabled] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: "", type: "" });
+  
+  // Add input state
+  const [fromInput, setFromInput] = useState("");
+  const [toInput, setToInput] = useState("");
 
   // Add notification helper function
   const showNotification = (message, type = "info") => {
@@ -20,6 +24,7 @@ function MyCustomComponent() {
       setNotification({ show: false, message: "", type: "" });
     }, 2000);
   };
+
   const setSpacesInteractive = (interactive) => {
     if (!mapView || !mapData) return;
     const spaces = mapData.getByType("space");
@@ -33,6 +38,53 @@ function MyCustomComponent() {
         console.warn("Could not update state for space:", space.name, error);
       }
     });
+  };
+
+  // Add function to find path by names
+  const findPathByNames = () => {
+    if (!fromInput.trim() || !toInput.trim()) {
+      showNotification("Please enter both from and to locations", "error");
+      return;
+    }
+
+    const spaces = mapData.getByType("space");
+    const fromSpace = spaces.find(space => 
+      space.name && space.name.toLowerCase().includes(fromInput.toLowerCase().trim())
+    );
+    const toSpace = spaces.find(space => 
+      space.name && space.name.toLowerCase().includes(toInput.toLowerCase().trim())
+    );
+
+    if (!fromSpace) {
+      showNotification(`Location "${fromInput}" not found`, "error");
+      return;
+    }
+    if (!toSpace) {
+      showNotification(`Location "${toInput}" not found`, "error");
+      return;
+    }
+
+    const directions = mapData.getDirections(fromSpace, toSpace);
+    if (!directions) {
+      showNotification("No path found between these locations", "error");
+      return;
+    }
+
+    // Clear existing path
+    if (path) {
+      mapView.Paths.removeAll();
+    }
+
+    const newPath = mapView.Paths.add(directions.coordinates, {
+      nearRadius: 0.5,
+      farRadius: 0.5,
+      color: "#1871fb",
+    });
+    
+    setPath(newPath);
+    setStartSpace(fromSpace);
+    setSpacesInteractive(false);
+    showNotification(`Path created from ${fromSpace.name} to ${toSpace.name}`, "success");
   };
 
   useEffect(() => {
@@ -193,6 +245,66 @@ function MyCustomComponent() {
           }}
         >
           {pathfindingEnabled ? "Disable Pathfinding" : "Enable Pathfinding"}
+        </button>
+      </div>
+
+      {/* From/To Input Boxes */}
+      <div style={{ 
+        background: "transparent", 
+        padding: "10px", 
+        marginBottom: "5px",
+      }}>
+        <input
+          type="text"
+          placeholder="From location"
+          value={fromInput}
+          onChange={(e) => setFromInput(e.target.value)}
+          style={{ 
+            width: "200px", 
+            height: '3vh', 
+            padding: "5px", 
+            borderRadius: "10px", 
+            border: "1px solid #ccc", 
+            backgroundColor: "rgba(255, 255, 255, 0.8)", 
+            color: "#333",
+            marginBottom: "5px",
+            fontSize: "14px"
+          }}
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="To location"
+          value={toInput}
+          onChange={(e) => setToInput(e.target.value)}
+          style={{ 
+            width: "200px", 
+            height: '3vh', 
+            padding: "5px", 
+            borderRadius: "10px", 
+            border: "1px solid #ccc", 
+            backgroundColor: "rgba(255, 255, 255, 0.8)", 
+            color: "#333",
+            marginBottom: "5px",
+            fontSize: "14px"
+          }}
+        />
+        <br />
+        <button
+          onClick={findPathByNames}
+          style={{ 
+            width: "200px", 
+            height: '3vh', 
+            padding: "5px", 
+            borderRadius: "10px", 
+            border: "1px solid #ccc", 
+            backgroundColor: "#28a745", 
+            color: "white",
+            cursor: "pointer",
+            fontSize: "14px"
+          }}
+        >
+          Find Path
         </button>
       </div>
 

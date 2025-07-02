@@ -53,55 +53,57 @@ function MyCustomComponent() {
   };
 
   // GPS location function
-  const getCurrentLocation = () => {
-    setIsGettingLocation(true);
-    setLocationError(null);
+const getCurrentLocation = () => {
+  setIsGettingLocation(true);
+  setLocationError(null);
 
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by this browser");
-      setIsGettingLocation(false);
-      showNotification("Geolocation not supported", "error");
-      return;
-    }
+  if (!navigator.geolocation) {
+    setLocationError("Geolocation is not supported by this browser");
+    setIsGettingLocation(false);
+    showNotification("Geolocation not supported", "error");
+    return;
+  }
 
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 60000, // Cache location for 1 minute
-    };
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        setUserLocation({ latitude, longitude, accuracy });
-        setIsGettingLocation(false);
-
-        showNotification(
-          `Location acquired (±${Math.round(accuracy)}m accuracy)`,
-          "success"
-        );
-        findNearestEntrance(latitude, longitude);
-      },
-      (error) => {
-        let errorMessage = "Unable to get location";
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied by user";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out";
-            break;
-        }
-        setLocationError(errorMessage);
-        setIsGettingLocation(false);
-        showNotification(errorMessage, "error");
-      },
-      options
-    );
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 60000, // Cache location for 1 minute
   };
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude, accuracy } = position.coords;
+      setUserLocation({ latitude, longitude, accuracy });
+      setIsGettingLocation(false);
+
+      showNotification(
+        `Location acquired (±${Math.round(accuracy)}m accuracy)`,
+        "success"
+      );
+      
+      // Use the new findNearestSpace function
+      findNearestSpace(latitude, longitude);
+    },
+    (error) => {
+      let errorMessage = "Unable to get location";
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = "Location access denied by user";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = "Location information unavailable";
+          break;
+        case error.TIMEOUT:
+          errorMessage = "Location request timed out";
+          break;
+      }
+      setLocationError(errorMessage);
+      setIsGettingLocation(false);
+      showNotification(errorMessage, "error");
+    },
+    options
+  );
+};
 
   // Calculate distance between two GPS coordinates (Haversine formula)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -119,95 +121,73 @@ function MyCustomComponent() {
   };
 
   // Function to find nearest entrance based on GPS coordinates
-  const findNearestEntrance = (userLat, userLon) => {
-    if (!mapData) return;
+const findNearestSpace = (userLat, userLon) => {
+  if (!mapData) {
+    showNotification("Map data not available", "error");
+    return;
+  }
 
-    // Define building entrances with their GPS coordinates
-    // Replace these with your actual building's entrance coordinates
-    const buildingEntrances = [
-      {
-        name: "Main Entrance",
-        latitude: 43.6532, // Replace with actual coordinates
-        longitude: -79.3832,
-        spaceNames: ["main entrance", "lobby", "reception"], // Possible space names
-      },
-      {
-        name: "North Entrance",
-        latitude: 43.6535,
-        longitude: -79.3835,
-        spaceNames: ["north entrance", "north lobby", "side entrance"],
-      },
-      {
-        name: "South Entrance",
-        latitude: 43.653,
-        longitude: -79.383,
-        spaceNames: ["south entrance", "south lobby", "back entrance"],
-      },
-    ];
+  const spaces = mapData.getByType("space");
+  
+  // Filter spaces that have names and valid coordinates
+  const validSpaces = spaces.filter(space => 
+    space.name && 
+    space.name.trim() !== "" && 
+    space.center && 
+    space.center.latitude && 
+    space.center.longitude
+  );
 
-    // Calculate distance to each entrance
-    let nearestEntrance = null;
-    let minDistance = Infinity;
+  if (validSpaces.length === 0) {
+    showNotification("No valid spaces found with coordinates", "error");
+    console.log("Available spaces:", spaces.map(s => ({ name: s.name, hasCoords: !!s.center.latitude && !!s.center.longitude })));
+    return;
+  }
 
-    buildingEntrances.forEach((entrance) => {
-      const distance = calculateDistance(
-        userLat,
-        userLon,
-        entrance.latitude,
-        entrance.longitude
-      );
+  // Calculate distance to each space
+  let nearestSpace = null;
+  let minDistance = Infinity;
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestEntrance = { ...entrance, distance };
-      }
+  validSpaces.forEach((space) => {
+    const distance = calculateDistance(
+      userLat,
+      userLon,
+      space.center.latitude,
+      space.center.longitude
+    );
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      //nearestSpace = { ...space, distance };
+      nearestSpace = space;
+    }
+  });
+
+  if (nearestSpace) {
+    setStartSpace(nearestSpace);
+    setFromInput(nearestSpace.name);
+    setNearestEntrance({
+      name: nearestSpace.name,
+      distance: minDistance
     });
 
-    if (nearestEntrance && minDistance < 1000) {
-      // Within 1km of building
-      setNearestEntrance(nearestEntrance);
-
-      // Try to find the corresponding space in map data
-      const spaces = mapData.getByType("space");
-      let entranceSpace = null;
-
-      // Look for spaces that match the entrance names
-      for (const spaceName of nearestEntrance.spaceNames) {
-        entranceSpace = spaces.find(
-          (space) =>
-            space.name &&
-            space.name.toLowerCase().includes(spaceName.toLowerCase())
-        );
-        if (entranceSpace) break;
+    showNotification(
+      `Starting from nearest space: ${nearestSpace.name} (${Math.round(minDistance)}m away)`,
+      "success"
+    );
+    
+    console.log("Nearest space found:", {
+      name: nearestSpace.name,
+      distance: Math.round(minDistance),
+      coordinates: {
+        lat: nearestSpace.center.latitude,
+        lng: nearestSpace.center.longitude
       }
-
-      // If no specific entrance space found, use the first space as fallback
-      if (!entranceSpace && spaces.length > 0) {
-        entranceSpace = spaces[0];
-      }
-
-      if (entranceSpace) {
-        setStartSpace(entranceSpace);
-        setFromInput(entranceSpace.name || "GPS Location");
-        showNotification(
-          `Starting from ${nearestEntrance.name} (${Math.round(
-            minDistance
-          )}m away)`,
-          "success"
-        );
-      } else {
-        showNotification(
-          `Nearest entrance: ${nearestEntrance.name}, but space not found in map`,
-          "warning"
-        );
-      }
-    } else {
-      showNotification(
-        "You appear to be far from the building. GPS accuracy may be limited.",
-        "warning"
-      );
-    }
-  };
+    });
+  } else {
+    showNotification("Could not find any nearby spaces", "error");
+  }
+};
 
   const setSpacesInteractive = (interactive) => {
     if (!mapView || !mapData) return;
@@ -354,6 +334,12 @@ function MyCustomComponent() {
   useEffect(() => {
     if (!mapView || !mapData) return;
 
+    // Set the Night Blue outdoor style
+    // mapView.Outdoor.setStyle('https://tiles-cdn.mappedin.com/styles/midnightblue/style.json');
+    mapView.Outdoor.setOpacity(0);
+
+    
+
     // Set the initial selected floor to the current floor
     if (mapView.currentFloor && !selectedFloor) {
       setSelectedFloor(mapView.currentFloor.id);
@@ -430,6 +416,12 @@ function MyCustomComponent() {
           showNotification(`Clicked: ${event.spaces[0].name}`, "info");
           console.log("Clicked on Space: " + event.spaces[0].name);
         }
+        if (event.spaces[0].center) {
+  console.log("Clicked space center coordinates:", {
+    latitude: event.spaces[0].center.latitude,
+    longitude: event.spaces[0].center.longitude
+  });
+}
       }
     };
 
@@ -584,18 +576,26 @@ function MyCustomComponent() {
           )}
 
           {/* GPS Navigation Section */}
-          <div className="nav-section">
+                    <div className="nav-section">
             <div className="section-title">
               <Navigation size={16} />
               <span>GPS Navigation</span>
             </div>
-            <input
-              type="text"
-              placeholder="🎯 Where do you want to go?"
+            <select
               value={toInput}
               onChange={(e) => setToInput(e.target.value)}
-              className="nav-input"
-            />
+              className="nav-select"
+            >
+              <option value="">🎯 Where do you want to go?</option>
+              {mapData && mapData.getByType("space")
+                .filter(space => space.name && space.name.trim() !== "")
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((space) => (
+                  <option key={space.id} value={space.name}>
+                    🎯 {space.name}
+                  </option>
+                ))}
+            </select>
             <button
               onClick={findPathFromCurrentLocation}
               disabled={!userLocation && !startSpace}
@@ -605,26 +605,43 @@ function MyCustomComponent() {
             </button>
           </div>
 
+
           {/* Manual Path Section */}
-          <div className="nav-section">
+                   <div className="nav-section">
             <div className="section-title">
               <Route size={16} />
               <span>Manual Path</span>
             </div>
-            <input
-              type="text"
-              placeholder="From location"
+            <select
               value={fromInput}
               onChange={(e) => setFromInput(e.target.value)}
-              className="nav-input"
-            />
-            <input
-              type="text"
-              placeholder="To location"
+              className="nav-select"
+            >
+              <option value="">Select starting location...</option>
+              {mapData && mapData.getByType("space")
+                .filter(space => space.name && space.name.trim() !== "")
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((space) => (
+                  <option key={space.id} value={space.name}>
+                    📍 {space.name}
+                  </option>
+                ))}
+            </select>
+            <select
               value={toInput}
               onChange={(e) => setToInput(e.target.value)}
-              className="nav-input"
-            />
+              className="nav-select"
+            >
+              <option value="">Select destination...</option>
+              {mapData && mapData.getByType("space")
+                .filter(space => space.name && space.name.trim() !== "")
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((space) => (
+                  <option key={space.id} value={space.name}>
+                    🎯 {space.name}
+                  </option>
+                ))}
+            </select>
             <button onClick={findPathByNames} className="nav-btn success">
               🗺️ Find Path
             </button>
@@ -764,7 +781,7 @@ function MyCustomComponent() {
           gap: 8px;
           margin-bottom: 12px;
           font-weight: 600;
-          color: #555;
+          color: white;
           font-size: 14px;
         }
 
@@ -853,6 +870,7 @@ function MyCustomComponent() {
           font-size: 14px;
           background: white;
           cursor: pointer;
+          margin-bottom: 7px;
           transition: all 0.2s ease;
         }
 
@@ -1059,8 +1077,9 @@ export default function App() {
   // Demo API credentials - replace with your own
   const { isLoading, error, mapData } = useMapData({
     key: "mik_yeBk0Vf0nNJtpesfu560e07e5",
-    secret: "mis_2g9ST8ZcSFb5R9fPnsvYhrX3RyRwPtDGbMGweCYKEq385431022",
+    secret: "mis_2g9ST8ZcSFb5R9fPnsvYhrX3RyRwPtDGbMGweCYKEq385431022",  
     mapId: "64ef49e662fd90fe020bee61",
+    //viewId: "jFiu",
   });
 
   if (isLoading) {
@@ -1133,8 +1152,16 @@ export default function App() {
   }
 
   return mapData ? (
-    <MapView mapData={mapData} style={{ width: "100%", height: "100%" }}>
-      <MyCustomComponent />
-    </MapView>
+    <MapView 
+  mapData={mapData} 
+  style={{ width: "100%", height: "100%" }}
+  options={{
+    outdoorView: {
+      style: 'https://tiles-cdn.mappedin.com/styles/midnightblue/style.json',
+    },
+  }}
+>
+  <MyCustomComponent />
+</MapView>
   ) : null;
 }

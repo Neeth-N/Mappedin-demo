@@ -698,22 +698,28 @@ const findNearestSpace = (userLat, userLon) => {
         }
 
         .toggle-btn {
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid #ddd;
-          border-radius: 12px;
-          padding: 12px;
+          background: rgba(20, 20, 30, 0.6);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 14px;
           cursor: pointer;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transition: all 0.3s ease;
+          box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           align-items: center;
           justify-content: center;
+          color: rgba(255, 255, 255, 0.9);
         }
 
         .toggle-btn:hover {
-          background: white;
+          background: rgba(30, 30, 40, 0.7);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+          box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .nav-container {
@@ -721,15 +727,36 @@ const findNearestSpace = (userLat, userLon) => {
           top: 20px;
           left: 20px;
           z-index: 1000;
-          background: transparent;
-          backdrop-filter: blur(5px);
-          border-radius: 16px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(15, 15, 25, 0.4);
+          backdrop-filter: blur(25px);
+          border-radius: 24px;
+          box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 0 0 1px rgba(255, 255, 255, 0.03);
           max-height: calc(100vh - 40px);
           overflow-y: auto;
-          transition: all 0.3s ease;
-          width: 320px;
+          overflow-x: hidden;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          width: 340px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-container::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .nav-container::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .nav-container::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 2px;
+        }
+
+        .nav-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.25);
         }
 
         .mobile-overlay {
@@ -737,7 +764,7 @@ const findNearestSpace = (userLat, userLon) => {
         }
 
         .nav-content {
-          padding: 20px;
+          padding: 24px;
           min-width: 280px;
         }
 
@@ -745,60 +772,88 @@ const findNearestSpace = (userLat, userLon) => {
           display: none;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 20px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #eee;
+          margin-bottom: 24px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .nav-header h3 {
           margin: 0;
-          color: #333;
-          font-size: 18px;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 20px;
+          font-weight: 600;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .close-btn {
-          background: none;
-          border: none;
+          background: rgba(30, 30, 40, 0.6);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           cursor: pointer;
-          padding: 5px;
-          color: #666;
-          border-radius: 6px;
-          transition: all 0.2s ease;
+          padding: 8px;
+          color: rgba(255, 255, 255, 0.7);
+          border-radius: 12px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .close-btn:hover {
-          background: #f0f0f0;
-          color: #333;
+          background: rgba(40, 40, 50, 0.7);
+          color: rgba(255, 255, 255, 0.9);
+          transform: scale(1.05);
         }
 
         .nav-section {
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
 
         .section-title {
           display: flex;
           align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
+          gap: 10px;
+          margin-bottom: 16px;
           font-weight: 600;
-          color: white;
-          font-size: 14px;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 15px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         .nav-btn {
           width: 100%;
-          padding: 12px 16px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
+          padding: 14px 18px;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           cursor: pointer;
           font-size: 14px;
           font-weight: 500;
-          transition: all 0.2s ease;
-          margin-bottom: 8px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          margin-bottom: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 10px;
+          backdrop-filter: blur(10px);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .nav-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .nav-btn:hover::before {
+          opacity: 1;
         }
 
         .nav-btn:last-child {
@@ -806,154 +861,226 @@ const findNearestSpace = (userLat, userLon) => {
         }
 
         .nav-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+          box-shadow: 
+            0 8px 25px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn:active {
+          transform: translateY(0);
         }
 
         .nav-btn:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
+          transform: none;
         }
 
         .nav-btn.primary {
-          background: #007bff;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(37, 99, 235, 0.6) 100%);
           color: white;
-          border-color: #007bff;
+          border-color: rgba(59, 130, 246, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(59, 130, 246, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.8) 100%);
+          box-shadow: 
+            0 8px 25px rgba(59, 130, 246, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
         .nav-btn.secondary {
-          background: #6c757d;
+          background: linear-gradient(135deg, rgba(107, 114, 128, 0.6) 0%, rgba(75, 85, 99, 0.6) 100%);
           color: white;
-          border-color: #6c757d;
+          border-color: rgba(107, 114, 128, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(107, 114, 128, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .nav-btn.success {
-          background: #28a745;
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.6) 0%, rgba(22, 163, 74, 0.6) 100%);
           color: white;
-          border-color: #28a745;
+          border-color: rgba(34, 197, 94, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(34, 197, 94, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .nav-btn.danger {
-          background: #dc3545;
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.6) 0%, rgba(220, 38, 38, 0.6) 100%);
           color: white;
-          border-color: #dc3545;
+          border-color: rgba(239, 68, 68, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(239, 68, 68, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .nav-btn.warning {
-          background: #ffc107;
-          color: #333;
-          border-color: #ffc107;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.6) 0%, rgba(217, 119, 6, 0.6) 100%);
+          color: white;
+          border-color: rgba(245, 158, 11, 0.3);
+          box-shadow: 
+            0 4px 15px rgba(245, 158, 11, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .nav-input {
           width: 100%;
-          padding: 12px 16px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
-          margin-bottom: 8px;
+          padding: 14px 18px;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          margin-bottom: 10px;
           font-size: 14px;
-          transition: all 0.2s ease;
-          background: white;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          background: rgba(20, 20, 30, 0.4);
+          backdrop-filter: blur(10px);
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-input::placeholder {
+          color: rgba(255, 255, 255, 0.4);
         }
 
         .nav-input:focus {
           outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          border-color: rgba(59, 130, 246, 0.4);
+          box-shadow: 
+            0 0 0 3px rgba(59, 130, 246, 0.08),
+            0 4px 15px rgba(59, 130, 246, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          background: rgba(25, 25, 35, 0.5);
         }
 
         .nav-select {
           width: 100%;
-          padding: 12px 16px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
+          padding: 14px 18px;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
           font-size: 14px;
-          background: white;
+          background: rgba(20, 20, 30, 0.4);
+          backdrop-filter: blur(10px);
+          color: rgba(255, 255, 255, 0.9);
           cursor: pointer;
-          margin-bottom: 7px;
-          transition: all 0.2s ease;
+          margin-bottom: 10px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-select option {
+          background: rgba(20, 20, 30, 0.95);
+          color: white;
+          padding: 10px;
         }
 
         .nav-select:focus {
           outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          border-color: rgba(59, 130, 246, 0.4);
+          box-shadow: 
+            0 0 0 3px rgba(59, 130, 246, 0.08),
+            0 4px 15px rgba(59, 130, 246, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          background: rgba(25, 25, 35, 0.5);
         }
 
         .location-info {
-          background: rgba(40, 167, 69, 0.1);
-          padding: 12px;
+          background: rgba(34, 197, 94, 0.1);
+          backdrop-filter: blur(10px);
+          padding: 16px;
           margin-bottom: 20px;
-          border-radius: 10px;
-          font-size: 12px;
-          color: #155724;
-          border: 1px solid rgba(40, 167, 69, 0.3);
+          border-radius: 16px;
+          font-size: 13px;
+          color: rgba(34, 197, 94, 0.9);
+          border: 1px solid rgba(34, 197, 94, 0.2);
+          box-shadow: 
+            0 4px 15px rgba(34, 197, 94, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .error-info {
-          background: rgba(220, 53, 69, 0.1);
-          padding: 12px;
+          background: rgba(239, 68, 68, 0.1);
+          backdrop-filter: blur(10px);
+          padding: 16px;
           margin-bottom: 20px;
-          border-radius: 10px;
-          font-size: 12px;
-          color: #721c24;
-          border: 1px solid rgba(220, 53, 69, 0.3);
+          border-radius: 16px;
+          font-size: 13px;
+          color: rgba(239, 68, 68, 0.9);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          box-shadow: 
+            0 4px 15px rgba(239, 68, 68, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .notification {
           position: fixed;
-          top: 1vh;
+          top: 4vh;
           left: 50%;
           transform: translate(-50%, -50%);
-          padding: 15px 20px;
-          border-radius: 10px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          padding: 18px 24px;
+          border-radius: 20px;
+          backdrop-filter: blur(25px);
+          box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
           z-index: 3000;
           font-size: 16px;
-          font-weight: bold;
+          font-weight: 600;
           text-align: center;
-          min-width: 250px;
-          max-width: 400px;
-          animation: slideInOut 3s ease-in-out;
+          min-width: 280px;
+          max-width: 420px;
+          animation: slideInOut 3s cubic-bezier(0.4, 0, 0.2, 1);
           white-space: pre-line;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .notification.error {
-          background: #dc3545;
+          background: rgba(239, 68, 68, 0.9);
           color: white;
+          border-color: rgba(239, 68, 68, 0.3);
         }
 
         .notification.success {
-          background: #28a745;
+          background: rgba(34, 197, 94, 0.9);
           color: white;
+          border-color: rgba(34, 197, 94, 0.3);
         }
 
         .notification.warning {
-          background: #ffc107;
-          color: #333;
+          background: rgba(245, 158, 11, 0.9);
+          color: white;
+          border-color: rgba(245, 158, 11, 0.3);
         }
 
         .notification.info {
-          background: #17a2b8;
+          background: rgba(59, 130, 246, 0.9);
           color: white;
+          border-color: rgba(59, 130, 246, 0.3);
         }
 
         @keyframes slideInOut {
           0% {
             opacity: 0;
             transform: translate(-50%, -60%) scale(0.8);
+            filter: blur(10px);
           }
           10% {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
+            filter: blur(0px);
           }
           90% {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
+            filter: blur(0px);
           }
           100% {
             opacity: 0;
             transform: translate(-50%, -40%) scale(0.8);
+            filter: blur(10px);
           }
         }
 
@@ -969,13 +1096,14 @@ const findNearestSpace = (userLat, userLon) => {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(25px);
             border-radius: 0;
             box-shadow: none;
             max-height: 100vh;
             transform: translateX(-100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
           }
 
           .nav-container.mobile-open {
@@ -989,12 +1117,13 @@ const findNearestSpace = (userLat, userLon) => {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             z-index: -1;
           }
 
           .nav-content {
-            padding: 20px;
+            padding: 24px;
             min-width: auto;
             max-width: 100%;
             height: 100%;
@@ -1006,36 +1135,40 @@ const findNearestSpace = (userLat, userLon) => {
           }
 
           .nav-btn {
-            padding: 14px 16px;
+            padding: 16px 20px;
             font-size: 16px;
             margin-bottom: 12px;
+            border-radius: 18px;
           }
 
           .nav-input {
-            padding: 14px 16px;
+            padding: 16px 20px;
             font-size: 16px;
             margin-bottom: 12px;
+            border-radius: 18px;
           }
 
           .nav-select {
-            padding: 14px 16px;
+            padding: 16px 20px;
             font-size: 16px;
+            border-radius: 18px;
           }
 
           .section-title {
             font-size: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
           }
 
           .nav-section {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
           }
 
           .location-info,
           .error-info {
             font-size: 14px;
-            padding: 16px;
+            padding: 18px;
             margin-bottom: 24px;
+            border-radius: 18px;
           }
 
           .notification {
@@ -1044,28 +1177,34 @@ const findNearestSpace = (userLat, userLon) => {
             transform: translateY(-50%);
             max-width: none;
             min-width: auto;
+            border-radius: 18px;
           }
         }
 
         /* Extra small screens */
         @media (max-width: 480px) {
           .nav-content {
-            padding: 16px;
+            padding: 20px;
           }
 
           .nav-btn {
-            padding: 16px;
-            font-size: 14px;
+            padding: 18px;
+            font-size: 15px;
           }
 
           .nav-input {
-            padding: 16px;
-            font-size: 14px;
+            padding: 18px;
+            font-size: 15px;
           }
 
           .nav-select {
-            padding: 16px;
-            font-size: 14px;
+            padding: 18px;
+            font-size: 15px;
+          }
+
+          .toggle-btn {
+            padding: 12px;
+            border-radius: 16px;
           }
         }
       `}</style>

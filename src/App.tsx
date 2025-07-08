@@ -1172,8 +1172,8 @@ const findNearestSpace = (userLat, userLon) => {
           }
 
           .notification {
-            left: 20px;
-            right: 20px;
+            left: 50%;
+            top: 6%;
             transform: translateY(-50%);
             max-width: none;
             min-width: auto;
